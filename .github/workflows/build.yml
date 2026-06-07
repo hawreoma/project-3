@@ -1,0 +1,36 @@
+name: Build Android AAB
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Buildozer
+        uses: actions/cache@v4
+        with:
+          path: |
+            .buildozer
+            ~/.buildozer
+          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+
+      - name: Build Android Release
+        uses: Dig-A-Byte/buildozer-action@v1.0.1
+        with:
+          command: buildozer android release
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vehicle-Expert-AI
+          path: |
+            bin/*.aab
+            bin/*.apk
